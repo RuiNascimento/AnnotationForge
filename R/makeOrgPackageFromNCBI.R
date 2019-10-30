@@ -327,7 +327,7 @@
     if ("tax_id" %in% unlist(file)) {
         .indexTaxIds(NCBIcon, tableName)
     }
-    
+
 
     ## get organism-specific data from NCBI.sqlite
     if (verbose)
@@ -1197,7 +1197,7 @@ splitBy <-
        !.isNCBIPopulatedWith(NCBIcon, 'altGO')) {
         .downloadAndPopulateAltGOData(NCBIcon, NCBIFilesDir, rebuildCache)
     }
-    
+
     ## Then get out the data that we *want* using another query with the tax_id
     sql <- paste0("
         SELECT EntrezGene, GO
@@ -1520,9 +1520,9 @@ makeOrgPackageFromNCBI <-
 ## lets make a helper to troll the ftp site and get ensembl to entrez
 ## gene ID data.  The names will be tax ids...
 getFastaSpeciesDirs <-
-    function(release=80)
+    function(release=45)
 {
-    baseUrl <- paste0("ftp://ftp.ensembl.org/pub/release-", release, "/mysql/")
+    baseUrl <- paste0("ftp://ftp.ensemblgenomes.org/pub/release-", release, "/plants/mysql/")
     loadNamespace("RCurl")
     curlHand <- RCurl::getCurlHandle()
     listing <- RCurl::getURL(url=baseUrl, followlocation=TRUE, curl=curlHand)
@@ -1535,6 +1535,11 @@ getFastaSpeciesDirs <-
     }
     res <-unlist(lapply(coreDirs, .getDirOnly))
     specNames <- available.FastaEnsemblSpecies(res)
+    # Fix for subspecies
+    specNames[specNames == "Oryza indica"] <- "Oryza sativa subsp. indica"
+    specNames[specNames == "Panicum hallii fil2"] <- "Panicum hallii"
+    specNames[specNames == "Panicum hallii hal2"] <- "Panicum hallii"
+    print(specNames) # Debug line (to be removed)
     taxIds <- unlist(lapply(specNames,
                             GenomeInfoDb:::lookup_tax_id_by_organism))
     names(res) <- taxIds
@@ -1549,7 +1554,7 @@ available.FastaEnsemblSpecies <-
     if (is.null(speciesDirs)) {
         speciesDirs <- getFastaSpeciesDirs()
     }
-    species <- sub('_core_\\d+_\\d+','',speciesDirs)
+    species <- sub('_core_\\d+_\\d+_\\d+','',speciesDirs)
     genSpec <- gsub('_', ' ', species)
     .upperCaseGenus <- function(str) {
         paste0(toupper(substr(str,start=1,stop=1)),
@@ -1577,7 +1582,7 @@ g.species <-
 {
     loadNamespace("biomaRt")
     datSet <- datSets[names(datSets) %in% taxId]
-    ens <- biomaRt::useMart('ensembl', datSet)
+    ens <- biomaRt::useMart('plants_mart', datSet, host = "plants.ensembl.org")
     at <- biomaRt::listAttributes(ens)
     any(grepl('entrezgene',at$name))
 }
@@ -1600,7 +1605,7 @@ available.ensembl.datasets <-
         ftpStrs <- paste0(g.specs, "_gene_ensembl")
         names(ftpStrs) <- names(g.specs)
         ## then get listing of the dataSets
-        ens <- biomaRt::useMart('ensembl')
+        ens <- biomaRt::useMart('plants_mart', host = "plants.ensembl.org")
         datSets <- biomaRt::listDatasets(ens)$dataset
         ## so which of the datSets are also in the FTP site?
         ## (when initially tested these two groups were perfectly synced)
@@ -1620,7 +1625,7 @@ available.ensembl.datasets <-
 
 ## ## now get those from the ensembl marts
 .getEnsemblData <-
-    function(taxId, release=80)
+    function(taxId, release=45)
 {
     loadNamespace("biomaRt")
     datSets <- available.ensembl.datasets()
