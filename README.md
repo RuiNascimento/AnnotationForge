@@ -5,7 +5,7 @@ _AnnotationForge_ is an R/Bioconductor package that provides tools for building 
 See https://bioconductor.org/packages/AnnotationForge for more information including how to install the release version of the package (please refrain from installing directly from GitHub).
 
 
-This is version of AnnotationForge as a custom makeOrgPackageFromNCBI() function that works with plants.ensembl.org. This will break compatibility with regular ensembl.
+This version of AnnotationForge has a custom makeOrgPackageFromNCBI() function that works with plants.ensembl.org. This will break compatibility with regular ensembl!
 
 TODO:
 - Add variable to choose wich ensembl server to use (try to preserve compatiblity with both ensembl databases.)
