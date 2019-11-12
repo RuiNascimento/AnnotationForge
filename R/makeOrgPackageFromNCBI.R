@@ -1544,7 +1544,6 @@ getFastaSpeciesDirs <-
     specNames[specNames == "Oryza indica"] <- "Oryza sativa subsp. indica"
     specNames[specNames == "Panicum hallii fil2"] <- "Panicum hallii"
     specNames[specNames == "Panicum hallii hal2"] <- "Panicum hallii"
-    print(specNames) # Debug line (to be removed)
     taxIds <- unlist(lapply(specNames,
                             GenomeInfoDb:::lookup_tax_id_by_organism))
     names(res) <- taxIds
@@ -1607,7 +1606,7 @@ available.ensembl.datasets <-
         loadNamespace("biomaRt")
         fastaSpecs <- available.FastaEnsemblSpecies()
         g.specs <- unlist(lapply(fastaSpecs, g.species))
-        ftpStrs <- paste0(g.specs, "_gene_ensembl")
+        ftpStrs <- paste0(g.specs, "_eg_gene")
         names(ftpStrs) <- names(g.specs)
         ## then get listing of the dataSets
         ens <- biomaRt::useMart('plants_mart', host = "plants.ensembl.org")
@@ -1635,7 +1634,7 @@ available.ensembl.datasets <-
     loadNamespace("biomaRt")
     datSets <- available.ensembl.datasets()
     datSet <- datSets[names(datSets) %in% taxId]
-    ens <- biomaRt::useMart('plants_mart', datSet)
+    ens <- biomaRt::useMart('plants_mart', datSet, host = "plants.ensembl.org")
     res <- biomaRt::getBM(
         attributes=c("entrezgene_id","ensembl_gene_id"),
         mart=ens)
