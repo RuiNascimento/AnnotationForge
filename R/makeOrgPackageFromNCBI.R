@@ -1635,7 +1635,7 @@ available.ensembl.datasets <-
     loadNamespace("biomaRt")
     datSets <- available.ensembl.datasets()
     datSet <- datSets[names(datSets) %in% taxId]
-    ens <- biomaRt::useMart('ensembl', datSet)
+    ens <- biomaRt::useMart('plants_mart', datSet)
     res <- biomaRt::getBM(
         attributes=c("entrezgene_id","ensembl_gene_id"),
         mart=ens)
