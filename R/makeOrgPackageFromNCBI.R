@@ -1633,7 +1633,7 @@ available.ensembl.datasets <-
 
 ## ## now get those from the ensembl marts
 .getEnsemblData <-
-    function(taxId, release=45)
+    function(taxId, release=47)
 {
     loadNamespace("biomaRt")
     datSets <- available.ensembl.datasets()
